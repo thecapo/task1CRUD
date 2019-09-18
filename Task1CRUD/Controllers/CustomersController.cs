@@ -24,7 +24,7 @@ namespace Task1CRUD.Controllers
             {
                 // Create a new Customer if collection is empty,
                 // which means you can't delete all Customer.
-                _context.Customer.Add(new Customer { Name = "Item1" });
+                _context.Customer.Add(new Customer { Name = "John Doe", Address = "Melbourne 3000" });
                 _context.SaveChanges();
             }
         }
@@ -36,7 +36,7 @@ namespace Task1CRUD.Controllers
             return await _context.Customer.ToListAsync();
         }
 
-        // GET: api/Customers/2
+        // GET: api/Customers/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
@@ -60,7 +60,7 @@ namespace Task1CRUD.Controllers
             return CreatedAtAction(nameof(GetCustomer), new { id = customer.Id }, customer);
         }
 
-        // PUT: api/Customers/2
+        // PUT: api/Customers/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
@@ -75,7 +75,7 @@ namespace Task1CRUD.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Customers/4
+        // DELETE: api/Customers/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
@@ -92,5 +92,4 @@ namespace Task1CRUD.Controllers
             return NoContent();
         }
     }
-
 }
