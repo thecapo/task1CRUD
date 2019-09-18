@@ -22,8 +22,8 @@ namespace Task1CRUD.Controllers
 
             if (_context.Product.Count() == 0)
             {
-                // Create a new Customer if collection is empty,
-                // which means you can't delete all Customer.
+                // Create a new Product if collection is empty,
+                // which means you can't delete all Product.
                 _context.Product.Add(new Product { Name = "Product1", Price = 8 });
                 _context.SaveChanges();
             }
@@ -52,7 +52,7 @@ namespace Task1CRUD.Controllers
 
         // POST: api/Products
         [HttpPost]
-        public async Task<ActionResult<Customer>> PostProduct(Product product)
+        public async Task<ActionResult<Product>> PostProduct(Product product)
         {
             _context.Product.Add(product);
             await _context.SaveChangesAsync();
