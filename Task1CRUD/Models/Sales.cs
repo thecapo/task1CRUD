@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Task1CRUD.Models
 {
@@ -9,6 +10,8 @@ namespace Task1CRUD.Models
         public int ProductId { get; set; }
         public int CustomerId { get; set; }
         public int StoreId { get; set; }
+
+        [DataType(DataType.Date)]
         public DateTime DateSold { get; set; }
 
         public virtual Customer Customer { get; set; }
