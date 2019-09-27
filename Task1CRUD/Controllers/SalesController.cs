@@ -23,17 +23,16 @@ namespace Task1CRUD.Controllers
 
         // GET: api/Sales
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Sales>>> GetSales()
-        {
-            return await _context.Sales.ToListAsync();
+        public async Task<ActionResult<IEnumerable<Sales>>> GetSales()        
+        {           
+            return await _context.Sales.Include(s => s.Store).Include(s => s.Product).Include(s => s.Customer).ToListAsync();
         }
 
         // GET: api/Sales/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Sales>> GetSale(int id)
         {
-            var sales = await _context.Sales.FindAsync(id);
-
+            var sales = await _context.Sales.FindAsync(id);         
             if (sales == null)
             {
                 return NotFound();
@@ -46,6 +45,7 @@ namespace Task1CRUD.Controllers
         [HttpPost]
         public async Task<ActionResult<Sales>> PostSales(Sales sales)
         {
+
             _context.Sales.Add(sales);
             await _context.SaveChangesAsync();
 

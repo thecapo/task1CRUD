@@ -20,13 +20,6 @@ namespace Task1CRUD.Controllers
         {
             _context = context;
 
-            if (_context.Product.Count() == 0)
-            {
-                // Create a new Product if collection is empty,
-                // which means you can't delete all Product.
-                _context.Product.Add(new Product { Name = "Product1", Price = 8 });
-                _context.SaveChanges();
-            }
         }
 
         // GET: api/Products

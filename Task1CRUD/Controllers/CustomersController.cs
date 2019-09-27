@@ -20,13 +20,6 @@ namespace Task1CRUD.Controllers
         {
             _context = context;
 
-            if (_context.Customer.Count() == 0)
-            {
-                // Create a new Customer if collection is empty,
-                // which means you can't delete all Customer.
-                _context.Customer.Add(new Customer { Name = "John Doe", Address = "Melbourne 3000" });
-                _context.SaveChanges();
-            }
         }
 
         // GET: api/Customers

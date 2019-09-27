@@ -20,13 +20,6 @@ namespace Task1CRUD.Controllers
         {
             _context = context;
 
-            if (_context.Store.Count() == 0)
-            {
-                // Create a new Store if collection is empty,
-                // which means you can't delete all Store.
-                _context.Store.Add(new Store { Name = "Store", Address = "Melbourne 3000" });
-                _context.SaveChanges();
-            }
         }
 
         // GET: api/Stores

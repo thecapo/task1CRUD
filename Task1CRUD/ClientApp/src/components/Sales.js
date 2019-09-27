@@ -1,41 +1,39 @@
 ﻿import React, { Component } from 'react';
-import { Icon, Menu, Table, Button, Modal, Input, Form } from 'semantic-ui-react';
+import { Icon, Menu, Table, Button, Modal, Input, Form, Dropdown } from 'semantic-ui-react';
 import axios from 'axios';
 
-class Customers extends Component {
+class Sales extends Component {
 
     state = {
         open: false,
-        name: '',
-        address: '',
-        customers: []
+        dateSold: new Date(),  
+        customer: '',
+        product: '',
+        store: '',
+        sales: []
     }
 
     open = () => this.setState({ open: true })
     close = () => this.setState({ open: false })
 
-    componentDidMount = () => {
-        axios.get('http://localhost:54397/api/customers/')
+    componentDidMount = () => {     
+        axios.get("http://localhost:54397/api/sales")
             .then(response => {
-                const customers = response.data;
+                const sales = response.data;
                 this.setState({
-                    customers
+                    sales
                 })
-                console.log("customers", this.state.customers);
+                console.log("sales", this.state.sales);   
+                console.log("sales", this.state.sales[0].store);   
+                //console.log("saledsfdsfdss", this.state.sales.map(sale => { return (sale.customer.name) }));                 
             })
-            .catch(err => console.log(err))
+            .catch(err => console.log(err))       
     };
 
-    handleChange = e => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
-    };
+    handleChange = (e, { value }) => this.setState({ value })
 
     handleSubmit = e => {
-        axios.post('http://localhost:54397/api/customers', {
-            name: this.state.name,
-            address: this.state.address
-        })
+        axios.post('http://localhost:54397/api/sales', this.state.value)
             .catch(err => console.log(err))
         this.setState({ open: false })
         window.location.reload()
@@ -45,10 +43,11 @@ class Customers extends Component {
     close = () => this.setState({ open: false })
 
     render() {
-        const { open, customers } = this.state
-
+        const { open, sales, customers } = this.state
+        
         return (
             <div>
+               
                 <Modal
                     as={Form}
                     onSubmit={this.handleSubmit}
@@ -58,31 +57,72 @@ class Customers extends Component {
                     onClose={this.close}
                     trigger={
                         <Button primary>
-                            New Customer
+                            New Sale
                         </Button>
                     }
                 >
-                    <Modal.Header>Create Customer</Modal.Header>
+                    <Modal.Header>Create Sales</Modal.Header>
                     <Modal.Content>
-                        <p>NAME</p>
+                        <p>Date Sold</p> 
                         <Input
                             fluid
-                            id="name"
-                            name="name"
+                            id="dateSold"
+                            name="dateSold"
                             required
-                            value={this.state.name}
+                            value={new Intl.DateTimeFormat('en-US').format(this.state.dateSold)}                            
                             onChange={this.handleChange}
+                        />
+                        <p>Customer</p> 
+                        <Dropdown
+                            placeholder='Select Customer'
+                            fluid
+                            name="customer"
+                            onChange={this.handleChange}
+                            selection
+                            options={this.state.sales.map(sale => {
+                                return ({
+                                    key: sale.customer.id,
+                                    text: sale.customer.name,
+                                    value: sale.customer.name
+                                })})}
+                            value={this.state.customer}
+                        />
+                      
+                        <p>Product</p>
+                        <Dropdown
+                            placeholder='Select Product'
+                            fluid
+                            name="product"
+                            onChange={this.handleChange}
+                            selection
+                            options={this.state.sales.map(sale => {
+                                return ({
+                                    key: sale.product.id,
+                                    text: sale.product.name,
+                                    value: sale.product.name
+                                })
+                            })}
+                            value={this.state.product}
+
                         />
 
-                        <p>ADDRESS</p>
-                        <Input
+                        <p>Store</p>
+                        <Dropdown
+                            placeholder='Select Store'
                             fluid
-                            id="address"
-                            name="address"
-                            required
-                            value={this.state.address}
+                            name="store"
                             onChange={this.handleChange}
+                            selection
+                            options={this.state.sales.map(sale => {
+                                return ({
+                                    key: sale.store.id,
+                                    text: sale.store.name,
+                                    value: sale.store.name
+                                })
+                            })}                
+                            value={this.state.store}
                         />
+                        
                     </Modal.Content>
                     <Modal.Actions>
                         <Button
@@ -103,28 +143,34 @@ class Customers extends Component {
                 <Table celled>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell>NAME</Table.HeaderCell>
-                            <Table.HeaderCell>ADDRESS</Table.HeaderCell>
+                            <Table.HeaderCell>Customer</Table.HeaderCell>
+                            <Table.HeaderCell>Product</Table.HeaderCell>
+                            <Table.HeaderCell>Store</Table.HeaderCell>
+                            <Table.HeaderCell>Date Sold</Table.HeaderCell>
                             <Table.HeaderCell>ACTIONS</Table.HeaderCell>
                             <Table.HeaderCell>ACTIONS</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
 
                     <Table.Body>
-                        {customers.map(customer => {
-                            return (                  
-                                <Table.Row key={customer.id}>                
-                                    <Table.Cell>{customer.name}</Table.Cell>
-                                    <Table.Cell>{customer.address}</Table.Cell>
+                        {sales.map(sale => {                           
+                            return (
+                                <Table.Row key={sale.id}>
+                                    <Table.Cell>{sale.customer.name}</Table.Cell>
+                                    <Table.Cell>{sale.product.name}</Table.Cell>
+                                    <Table.Cell>{sale.store.name}</Table.Cell>         
+                                    <Table.Cell>{new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(sale.dateSold))}</Table.Cell>
                                     <Table.Cell>
-                                        <EditModal customer={customer} />
+                                        <EditModal sale={sale} />
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <DeleteModal customerId={customer.id}/>
-                                    </Table.Cell> 
+                                        <DeleteModal saleId={sale.id} />
+                                    </Table.Cell>
                                 </Table.Row>
                             )
                         })}
+
+
                     </Table.Body>
 
                     <Table.Footer>
@@ -145,7 +191,7 @@ class Customers extends Component {
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Footer>
-                </Table>                  
+                </Table>
             </div>
         )
     }
@@ -158,7 +204,7 @@ class DeleteModal extends Component {
     close = () => this.setState({ open: false })
 
     handleDelete = value => e => {
-        axios.delete(`http://localhost:54397/api/customers/${value}`)
+        axios.delete(`http://localhost:54397/api/sales/${value}`)
         this.setState({ open: false })
         window.location.reload()
     }
@@ -167,7 +213,7 @@ class DeleteModal extends Component {
         const { open } = this.state
         return (
             <Modal
-                key="customerDelete"
+                key="saleDelete"
                 size="tiny"
                 open={open}
                 onOpen={this.open}
@@ -182,16 +228,16 @@ class DeleteModal extends Component {
                     </Button>
                 }
             >
-                <Modal.Header>Delete customer</Modal.Header>
+                <Modal.Header>Delete sale</Modal.Header>
                 <Modal.Content>Are you sure?</Modal.Content>
                 <Modal.Actions>
                     <Button
                         secondary
                         onClick={() => this.setState({ open: false })}
                         content='cancel'
-                    />                      
-                    <Button                        
-                        onClick={this.handleDelete(this.props.customerId)}
+                    />
+                    <Button
+                        onClick={this.handleDelete(this.props.saleId)}
                         color='red'
                         icon='times'
                         labelPosition='right'
@@ -206,9 +252,13 @@ class DeleteModal extends Component {
 class EditModal extends Component {
     state = {
         open: false,
-        id: this.props.customer.id,
-        name: this.props.customer.name,
-        address: this.props.customer.address
+        id: this.props.saleId,       
+        customerId: '',
+        productId: '',
+        storeId: '',
+        customer: this.props.sale.customer.name,
+        product: this.props.sale.product.name,
+        store: this.props.sale.store.name
     }
 
     open = () => this.setState({ open: true })
@@ -222,22 +272,27 @@ class EditModal extends Component {
 
     handleEdit = value => e => {
         e.preventDefault()
-        const customer = {
-            id: this.state.id,
-            name: this.state.name,
-            address: this.state.address
+        const sale = {
+            id: this.state.saleId,
+            customerId: this.state.customer,
+            productId: this.state.product,
+            storeId: this.state.store
         }
-        const url = `http://localhost:54397/api/customers/${value}`
-        axios.put(url, customer) 
+        const url = `http://localhost:54397/api/sales/${value}`
+        axios.put(url, sale)
         this.setState({ open: false })
         window.location.reload()
     }
 
     render() {
         const { open } = this.state
+
+      
+
+
         return (
             <Modal
-                key="customerEdit"
+                key="saleEdit"
                 size="tiny"
                 open={open}
                 onOpen={this.open}
@@ -252,25 +307,37 @@ class EditModal extends Component {
                     </Button>
                 }
             >
-                <Modal.Header>Edit customer</Modal.Header>
+                <Modal.Header>Edit sale</Modal.Header>
                 <Modal.Content>
-                    <p>NAME</p>
+                    <p>CUSTOMER NAME</p>
                     <Input
                         fluid
-                        id="name"
-                        name="name"
+                        id="customer"
+                        name="customer"
                         required
-                        value={this.state.name}
+                        value={this.state.customer}
+                        onChange={this.handleChange}
+                    />
+                   
+
+
+                    <p>PRODUCT NAME</p>
+                    <Input
+                        fluid
+                        id="product"
+                        name="product"
+                        required
+                        value={this.state.product}
                         onChange={this.handleChange}
                     />
 
-                    <p>ADDRESS</p>
+                    <p>STORE NAME</p>
                     <Input
                         fluid
-                        id="address"
-                        name="address"
-                        required                      
-                        value={this.state.address}
+                        id="store"
+                        name="store"
+                        required
+                        value={this.state.store}
                         onChange={this.handleChange}
                     />
                 </Modal.Content>
@@ -281,7 +348,7 @@ class EditModal extends Component {
                         content='cancel'
                     />
                     <Button
-                        onClick={this.handleEdit(this.props.customer.id)}                     
+                        onClick={this.handleEdit(this.props.saleId)}
                         positive
                         icon='checkmark'
                         labelPosition='right'
@@ -293,4 +360,4 @@ class EditModal extends Component {
     }
 }
 
-export default Customers;
+export default Sales;
