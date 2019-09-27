@@ -24,6 +24,8 @@ namespace Task1CRUD
             var connection = @"Data Source=LAPTOP-OVPS8BMM\SQLEXPRESS;Initial Catalog=Onboarding_Assignment_Task1;Integrated Security=True";
             services.AddDbContext<Onboarding_Assignment_Task1Context>(options => options.UseSqlServer(connection));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+        );
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
