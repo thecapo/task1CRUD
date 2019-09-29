@@ -165,7 +165,8 @@ class DeleteModal extends Component {
     close = () => this.setState({ open: false })
 
     handleDelete = value => e => {          
-        axios.delete(`http://localhost:54397/api/customers/${value}`)          
+        axios.delete(`http://localhost:54397/api/customers/${value}`)       
+        alert("Items will not be deleted if they are connected to Sales page...")
         this.setState({ open: false })         
         window.location.reload()
     }
