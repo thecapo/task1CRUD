@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Icon, Menu, Table, Button, Modal, Input, Form } from 'semantic-ui-react';
+import { Table, Button, Modal, Input, Form, Pagination } from 'semantic-ui-react';
 import axios from 'axios';
 
 class Stores extends Component {
@@ -8,7 +8,9 @@ class Stores extends Component {
         open: false,
         name: '',
         address: '',
-        stores: []
+        stores: [],
+        page: 1,
+        itemsPerPage: 10
     }
 
     open = () => this.setState({ open: true })
@@ -41,12 +43,22 @@ class Stores extends Component {
         window.location.reload()
     };
 
+    setPageNum = (event, { activePage }) => {
+        this.setState({ page: activePage });
+    };
+
     show = (size) => () => this.setState({ size, open: true })
     close = () => this.setState({ open: false })
 
     render() {
         const { open, stores } = this.state
-
+        const itemsPerPage = 10;
+        const { page } = this.state;
+        const totalPages = stores.length / itemsPerPage;
+        const storeItems = stores.slice(
+            (page - 1) * itemsPerPage,
+            (page - 1) * itemsPerPage + itemsPerPage
+        );
         return (
             <div>
                 <Modal
@@ -111,7 +123,7 @@ class Stores extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {stores.map(store => {
+                        {storeItems.map(store => {
                             return (
                                 <Table.Row key={store.id}>
                                     <Table.Cell>{store.name}</Table.Cell>
@@ -132,18 +144,12 @@ class Stores extends Component {
                     <Table.Footer>
                         <Table.Row>
                             <Table.HeaderCell colSpan='3'>
-                                <Menu floated='right' pagination>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron left' />
-                                    </Menu.Item>
-                                    <Menu.Item as='a'>1</Menu.Item>
-                                    <Menu.Item as='a'>2</Menu.Item>
-                                    <Menu.Item as='a'>3</Menu.Item>
-                                    <Menu.Item as='a'>4</Menu.Item>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron right' />
-                                    </Menu.Item>
-                                </Menu>
+                                <Pagination
+                                    activePage={page}
+                                    totalPages={totalPages}
+                                    siblingRange={1}
+                                    onPageChange={this.setPageNum}
+                                />
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Footer>

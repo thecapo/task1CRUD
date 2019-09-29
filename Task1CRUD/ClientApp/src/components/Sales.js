@@ -1,16 +1,21 @@
 ﻿import React, { Component } from 'react';
-import { Icon, Menu, Table, Button, Modal, Input, Form, Dropdown } from 'semantic-ui-react';
+import { Table, Button, Modal, Input, Form, Dropdown, Pagination } from 'semantic-ui-react';
 import axios from 'axios';
 
 class Sales extends Component {
 
     state = {
         open: false,
-        dateSold: new Date(),  
-        customer: '',
-        product: '',
-        store: '',
-        sales: []
+        dateSold: new Intl.DateTimeFormat('en-US').format(new Date()),  
+        customerId: 0,
+        productId: 0,
+        storeId: 0,
+        customers: [],
+        products: [],
+        stores: [],
+        sales: [],
+        page: 1,
+        itemsPerPage: 10
     }
 
     open = () => this.setState({ open: true })
@@ -19,23 +24,59 @@ class Sales extends Component {
     componentDidMount = () => {     
         axios.get("http://localhost:54397/api/sales")
             .then(response => {
-                const sales = response.data;
+                const sales = response.data;                
                 this.setState({
                     sales
-                })
-                console.log("sales", this.state.sales);   
-                console.log("sales", this.state.sales[0].store);   
-                //console.log("saledsfdsfdss", this.state.sales.map(sale => { return (sale.customer.name) }));                 
+                })                
             })
-            .catch(err => console.log(err))       
+            .catch(err => console.log(err))      
+
+        axios.get("http://localhost:54397/api/customers")
+            .then(response => {
+                const customers = response.data;
+                this.setState({
+                    customers
+                })           
+            })
+            .catch(err => console.log(err)) 
+
+        axios.get("http://localhost:54397/api/products")
+            .then(response => {
+                const products = response.data;
+                this.setState({
+                    products
+                })                
+            })
+            .catch(err => console.log(err)) 
+
+        axios.get("http://localhost:54397/api/stores")
+            .then(response => {
+                const stores = response.data;
+                this.setState({
+                    stores
+                })              
+            })
+            .catch(err => console.log(err)) 
     };
 
-    handleChange = (e, { value }) => this.setState({ value })
+    handleChange = (e, { name, value }) => {
+        this.setState({ [name]: value })        
+    };
+
+    setPageNum = (event, { activePage }) => {
+        this.setState({ page: activePage });
+    };
 
     handleSubmit = e => {
-        axios.post('http://localhost:54397/api/sales', this.state.value)
+        e.preventDefault();
+        axios.post('http://localhost:54397/api/sales', {
+            dateSold: this.state.dateSold, 
+            customerId: this.state.customerId,
+            productId: this.state.productId,
+            storeId: this.state.storeId
+        })
             .catch(err => console.log(err))
-        this.setState({ open: false })
+        this.setState({ open: false })              
         window.location.reload()
     };
 
@@ -43,11 +84,17 @@ class Sales extends Component {
     close = () => this.setState({ open: false })
 
     render() {
-        const { open, sales, customers } = this.state
+        const { open, sales, customers, products, stores } = this.state
+        const itemsPerPage = 10;
+        const { page } = this.state;
+        const totalPages = sales.length / itemsPerPage;
+        const salesItems = sales.slice(
+            (page - 1) * itemsPerPage,
+            (page - 1) * itemsPerPage + itemsPerPage
+        );
         
         return (
-            <div>
-               
+            <div>               
                 <Modal
                     as={Form}
                     onSubmit={this.handleSubmit}
@@ -69,58 +116,55 @@ class Sales extends Component {
                             id="dateSold"
                             name="dateSold"
                             required
-                            value={new Intl.DateTimeFormat('en-US').format(this.state.dateSold)}                            
+                            value={this.state.dateSold}                         
                             onChange={this.handleChange}
                         />
                         <p>Customer</p> 
                         <Dropdown
                             placeholder='Select Customer'
                             fluid
-                            name="customer"
+                            name="customerId"
                             onChange={this.handleChange}
                             selection
-                            options={this.state.sales.map(sale => {
+                            options={customers.map(customer => {
                                 return ({
-                                    key: sale.customer.id,
-                                    text: sale.customer.name,
-                                    value: sale.customer.name
-                                })})}
-                            value={this.state.customer}
+                                    key: customer.id,
+                                    text: customer.name,
+                                    value: customer.id
+                                })
+                            })}                
                         />
-                      
+                  
                         <p>Product</p>
                         <Dropdown
                             placeholder='Select Product'
                             fluid
-                            name="product"
+                            name="productId"
                             onChange={this.handleChange}
                             selection
-                            options={this.state.sales.map(sale => {
+                            options={products.map(product => {
                                 return ({
-                                    key: sale.product.id,
-                                    text: sale.product.name,
-                                    value: sale.product.name
+                                    key: product.id,
+                                    text: product.name,
+                                    value: product.id
                                 })
-                            })}
-                            value={this.state.product}
-
+                            })}                            
                         />
 
                         <p>Store</p>
                         <Dropdown
                             placeholder='Select Store'
                             fluid
-                            name="store"
+                            name="storeId"
                             onChange={this.handleChange}
                             selection
-                            options={this.state.sales.map(sale => {
+                            options={stores.map(store => {
                                 return ({
-                                    key: sale.store.id,
-                                    text: sale.store.name,
-                                    value: sale.store.name
+                                    key: store.id,
+                                    text: store.name,
+                                    value: store.id
                                 })
-                            })}                
-                            value={this.state.store}
+                            })}                                            
                         />
                         
                     </Modal.Content>
@@ -153,15 +197,21 @@ class Sales extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {sales.map(sale => {                           
+                        {salesItems.map(sale => {                           
                             return (
                                 <Table.Row key={sale.id}>
                                     <Table.Cell>{sale.customer.name}</Table.Cell>
                                     <Table.Cell>{sale.product.name}</Table.Cell>
-                                    <Table.Cell>{sale.store.name}</Table.Cell>         
-                                    <Table.Cell>{new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'short', day: '2-digit' }).format(new Date(sale.dateSold))}</Table.Cell>
+                                    <Table.Cell>{sale.store.name}</Table.Cell>   
+                                    
+                                    <Table.Cell>{sale.dateSold}</Table.Cell>
                                     <Table.Cell>
-                                        <EditModal sale={sale} />
+                                        <EditModal
+                                            sale={sale}
+                                            customers={customers}
+                                            products={products}
+                                            stores={stores}
+                                        />
                                     </Table.Cell>
                                     <Table.Cell>
                                         <DeleteModal saleId={sale.id} />
@@ -170,24 +220,17 @@ class Sales extends Component {
                             )
                         })}
 
-
                     </Table.Body>
 
                     <Table.Footer>
                         <Table.Row>
                             <Table.HeaderCell colSpan='3'>
-                                <Menu floated='right' pagination>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron left' />
-                                    </Menu.Item>
-                                    <Menu.Item as='a'>1</Menu.Item>
-                                    <Menu.Item as='a'>2</Menu.Item>
-                                    <Menu.Item as='a'>3</Menu.Item>
-                                    <Menu.Item as='a'>4</Menu.Item>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron right' />
-                                    </Menu.Item>
-                                </Menu>
+                                <Pagination
+                                    activePage={page}
+                                    totalPages={totalPages}
+                                    siblingRange={1}
+                                    onPageChange={this.setPageNum}
+                                />
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Footer>
@@ -251,44 +294,39 @@ class DeleteModal extends Component {
 
 class EditModal extends Component {
     state = {
-        open: false,
-        id: this.props.saleId,       
-        customerId: '',
-        productId: '',
-        storeId: '',
-        customer: this.props.sale.customer.name,
-        product: this.props.sale.product.name,
-        store: this.props.sale.store.name
+        open: false,               
+        customerId: this.props.sale.customer.id,
+        productId: this.props.sale.product.id,
+        storeId: this.props.sale.store.id,
+        dateSold: this.props.sale.dateSold  
     }
 
     open = () => this.setState({ open: true })
     close = () => this.setState({ open: false })
 
-
-    handleChange = e => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
+    handleChange = (e, { name, value }) => {
+        this.setState({ [name]: value })        
     };
 
     handleEdit = value => e => {
         e.preventDefault()
         const sale = {
-            id: this.state.saleId,
-            customerId: this.state.customer,
-            productId: this.state.product,
-            storeId: this.state.store
+            id: this.props.sale.id,
+            customerId: this.state.customerId,
+            productId: this.state.productId,
+            storeId: this.state.storeId,
+            dateSold: this.props.sale.dateSold
         }
         const url = `http://localhost:54397/api/sales/${value}`
         axios.put(url, sale)
-        this.setState({ open: false })
+        this.setState({ open: false })        
         window.location.reload()
     }
 
     render() {
         const { open } = this.state
 
-      
-
+        
 
         return (
             <Modal
@@ -309,36 +347,65 @@ class EditModal extends Component {
             >
                 <Modal.Header>Edit sale</Modal.Header>
                 <Modal.Content>
-                    <p>CUSTOMER NAME</p>
+                    <p>Date Sold</p>
                     <Input
                         fluid
-                        id="customer"
-                        name="customer"
+                        id="dateSold"
+                        name="dateSold"
                         required
-                        value={this.state.customer}
-                        onChange={this.handleChange}
-                    />
-                   
-
-
-                    <p>PRODUCT NAME</p>
-                    <Input
-                        fluid
-                        id="product"
-                        name="product"
-                        required
-                        value={this.state.product}
+                        value={this.props.sale.dateSold}
                         onChange={this.handleChange}
                     />
 
-                    <p>STORE NAME</p>
-                    <Input
+                    <p>Customer</p>
+                    <Dropdown
+                        placeholder={this.props.sale.customer.name}
+                        defaultValue={this.props.sale.customer.id}
                         fluid
-                        id="store"
-                        name="store"
-                        required
-                        value={this.state.store}
+                        name="customerId"
                         onChange={this.handleChange}
+                        selection                                 
+                        options={this.props.customers.map(customer => {
+                            return ({
+                                key: customer.id,
+                                text: customer.name,
+                                value: customer.id
+                            })
+                        })}
+                    />
+
+                    <p>Product</p>
+                    <Dropdown
+                        placeholder={this.props.sale.product.name}
+                        defaultValue={this.props.sale.product.id}
+                        fluid
+                        name="productId"
+                        onChange={this.handleChange}
+                        selection                        
+                        options={this.props.products.map(product => {
+                            return ({
+                                key: product.id,
+                                text: product.name,
+                                value: product.id
+                            })
+                        })}
+                    />
+
+                    <p>Store</p>
+                    <Dropdown
+                        placeholder={this.props.sale.store.name}
+                        defaultValue={this.props.sale.store.id}
+                        fluid                        
+                        name="storeId"
+                        onChange={this.handleChange}
+                        selection                        
+                        options={this.props.stores.map(store => {
+                            return ({
+                                key: store.id,
+                                text: store.name,
+                                value: store.id
+                            })
+                        })}
                     />
                 </Modal.Content>
                 <Modal.Actions>
@@ -348,7 +415,7 @@ class EditModal extends Component {
                         content='cancel'
                     />
                     <Button
-                        onClick={this.handleEdit(this.props.saleId)}
+                        onClick={this.handleEdit(this.props.sale.id)}
                         positive
                         icon='checkmark'
                         labelPosition='right'

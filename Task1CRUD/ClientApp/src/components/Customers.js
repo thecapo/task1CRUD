@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Icon, Menu, Table, Button, Modal, Input, Form } from 'semantic-ui-react';
+import { Table, Button, Modal, Input, Form, Pagination } from 'semantic-ui-react';
 import axios from 'axios';
 
 class Customers extends Component {
@@ -8,7 +8,9 @@ class Customers extends Component {
         open: false,
         name: '',
         address: '',
-        customers: []
+        customers: [],
+        page: 1,
+        itemsPerPage: 10
     }
 
     open = () => this.setState({ open: true })
@@ -41,11 +43,22 @@ class Customers extends Component {
         window.location.reload()
     };
 
+    setPageNum = (event, { activePage }) => {
+        this.setState({ page: activePage });
+    };
+
     show = (size) => () => this.setState({ size, open: true })
     close = () => this.setState({ open: false })
 
     render() {
         const { open, customers } = this.state
+        const itemsPerPage = 10;
+        const { page } = this.state;
+        const totalPages = customers.length / itemsPerPage;
+        const customerItems = customers.slice(
+            (page - 1) * itemsPerPage,
+            (page - 1) * itemsPerPage + itemsPerPage
+        );
 
         return (
             <div>
@@ -111,7 +124,7 @@ class Customers extends Component {
                     </Table.Header>
 
                     <Table.Body>
-                        {customers.map(customer => {
+                        {customerItems.map(customer => {
                             return (                  
                                 <Table.Row key={customer.id}>                
                                     <Table.Cell>{customer.name}</Table.Cell>
@@ -130,18 +143,12 @@ class Customers extends Component {
                     <Table.Footer>
                         <Table.Row>
                             <Table.HeaderCell colSpan='3'>
-                                <Menu floated='right' pagination>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron left' />
-                                    </Menu.Item>
-                                    <Menu.Item as='a'>1</Menu.Item>
-                                    <Menu.Item as='a'>2</Menu.Item>
-                                    <Menu.Item as='a'>3</Menu.Item>
-                                    <Menu.Item as='a'>4</Menu.Item>
-                                    <Menu.Item as='a' icon>
-                                        <Icon name='chevron right' />
-                                    </Menu.Item>
-                                </Menu>
+                                <Pagination
+                                    activePage={page}
+                                    totalPages={totalPages}
+                                    siblingRange={1}
+                                    onPageChange={this.setPageNum}
+                                />
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Footer>
@@ -157,9 +164,9 @@ class DeleteModal extends Component {
     open = () => this.setState({ open: true })
     close = () => this.setState({ open: false })
 
-    handleDelete = value => e => {
-        axios.delete(`http://localhost:54397/api/customers/${value}`)
-        this.setState({ open: false })
+    handleDelete = value => e => {          
+        axios.delete(`http://localhost:54397/api/customers/${value}`)          
+        this.setState({ open: false })         
         window.location.reload()
     }
 
