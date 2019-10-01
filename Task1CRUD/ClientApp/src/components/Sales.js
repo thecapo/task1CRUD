@@ -22,7 +22,7 @@ class Sales extends Component {
     close = () => this.setState({ open: false })
 
     componentDidMount = () => {     
-        axios.get("http://localhost:54397/api/sales")
+        axios.get("http://crud-task.azurewebsites.net/api/sales")
             .then(response => {
                 const sales = response.data;                
                 this.setState({
@@ -31,7 +31,7 @@ class Sales extends Component {
             })
             .catch(err => console.log(err))      
 
-        axios.get("http://localhost:54397/api/customers")
+        axios.get("http://crud-task.azurewebsites.net/api/customers")
             .then(response => {
                 const customers = response.data;
                 this.setState({
@@ -40,7 +40,7 @@ class Sales extends Component {
             })
             .catch(err => console.log(err)) 
 
-        axios.get("http://localhost:54397/api/products")
+        axios.get("http://crud-task.azurewebsites.net/api/products")
             .then(response => {
                 const products = response.data;
                 this.setState({
@@ -49,7 +49,7 @@ class Sales extends Component {
             })
             .catch(err => console.log(err)) 
 
-        axios.get("http://localhost:54397/api/stores")
+        axios.get("http://crud-task.azurewebsites.net/api/stores")
             .then(response => {
                 const stores = response.data;
                 this.setState({
@@ -69,7 +69,7 @@ class Sales extends Component {
 
     handleSubmit = e => {
         e.preventDefault();
-        axios.post('http://localhost:54397/api/sales', {
+        axios.post('http://crud-task.azurewebsites.net/api/sales', {
             dateSold: this.state.dateSold, 
             customerId: this.state.customerId,
             productId: this.state.productId,
@@ -247,7 +247,7 @@ class DeleteModal extends Component {
     close = () => this.setState({ open: false })
 
     handleDelete = value => e => {
-        axios.delete(`http://localhost:54397/api/sales/${value}`)
+        axios.delete(`http://crud-task.azurewebsites.net/api/sales/${value}`)
         this.setState({ open: false })
         window.location.reload()
     }
@@ -317,7 +317,7 @@ class EditModal extends Component {
             storeId: this.state.storeId,
             dateSold: this.props.sale.dateSold
         }
-        const url = `http://localhost:54397/api/sales/${value}`
+        const url = `http://crud-task.azurewebsites.net/api/sales/${value}`
         axios.put(url, sale)
         this.setState({ open: false })        
         window.location.reload()

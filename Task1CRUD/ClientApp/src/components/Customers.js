@@ -17,7 +17,7 @@ class Customers extends Component {
     close = () => this.setState({ open: false })
 
     componentDidMount = () => {
-        axios.get('http://localhost:54397/api/customers/')
+        axios.get('http://crud-task.azurewebsites.net/api/customers/')
             .then(response => {
                 const customers = response.data;
                 this.setState({
@@ -34,7 +34,7 @@ class Customers extends Component {
     };
 
     handleSubmit = e => {
-        axios.post('http://localhost:54397/api/customers', {
+        axios.post('http://crud-task.azurewebsites.net/api/customers', {
             name: this.state.name,
             address: this.state.address
         })
@@ -165,7 +165,7 @@ class DeleteModal extends Component {
     close = () => this.setState({ open: false })
 
     handleDelete = value => e => {          
-        axios.delete(`http://localhost:54397/api/customers/${value}`)       
+        axios.delete(`http://crud-task.azurewebsites.net/api/customers/${value}`)       
         alert("Items will not be deleted if they are connected to Sales page...")
         this.setState({ open: false })         
         window.location.reload()
@@ -235,7 +235,7 @@ class EditModal extends Component {
             name: this.state.name,
             address: this.state.address
         }
-        const url = `http://localhost:54397/api/customers/${value}`
+        const url = `http://crud-task.azurewebsites.net/api/customers/${value}`
         axios.put(url, customer) 
         this.setState({ open: false })
         window.location.reload()
