@@ -72,7 +72,7 @@ namespace Task1CRUD.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {         
-            var customer = await _context.Customer.FindAsync(id);
+            var customer = await _context.Customer.FindAsync(id);            
 
             if (customer == null)
             {

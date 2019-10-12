@@ -22,7 +22,7 @@ namespace Task1CRUD
         public void ConfigureServices(IServiceCollection services)
         {
             //var connection = Configuration.GetConnectionString("MyConnectionString");
-            var connection = @"Server=tcp:crud-task-server.database.windows.net,1433;Initial Catalog=Onboarding_Assignment_Task1;Persist Security Info=False;User ID=carlotheadmin;Password=fuckAZURE123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"; 
+            var connection = @"Server=tcp:crud-task-server.database.windows.net,1433;Initial Catalog=Onboarding_Assignment_Task1-cascade;Persist Security Info=False;User ID=carlotheadmin;Password=fuckAZURE123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
             //var connection = @"Data Source=LAPTOP-OVPS8BMM\SQLEXPRESS;Initial Catalog=Onboarding_Assignment_Task1;Integrated Security=True";
             services.AddDbContext<Onboarding_Assignment_Task1Context>(options => options.UseSqlServer(connection));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

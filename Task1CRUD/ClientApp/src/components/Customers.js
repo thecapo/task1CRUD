@@ -38,9 +38,9 @@ class Customers extends Component {
             name: this.state.name,
             address: this.state.address
         })
-            .catch(err => console.log(err))
+            .then(response => this.setState({ customers: [...this.state.customers, response.data], name: '', address: '' }))
+            .catch(err => console.log(err))        
         this.setState({ open: false })
-        window.location.reload()
     };
 
     setPageNum = (event, { activePage }) => {
@@ -133,7 +133,7 @@ class Customers extends Component {
                                         <EditModal customer={customer} />
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <DeleteModal customerId={customer.id}/>
+                                        <DeleteModal customerId={customer.id} />
                                     </Table.Cell> 
                                 </Table.Row>
                             )
@@ -164,10 +164,9 @@ class DeleteModal extends Component {
     open = () => this.setState({ open: true })
     close = () => this.setState({ open: false })
 
-    handleDelete = value => e => {          
+    handleDelete = value => e => {                 
         axios.delete(`http://crud-task.azurewebsites.net/api/customers/${value}`)       
-        alert("Items will not be deleted if they are connected to Sales page...")
-        this.setState({ open: false })         
+        this.setState({ open: false })
         window.location.reload()
     }
 

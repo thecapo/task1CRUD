@@ -76,8 +76,8 @@ class Sales extends Component {
             storeId: this.state.storeId
         })
             .catch(err => console.log(err))
-        this.setState({ open: false })              
-        window.location.reload()
+        this.setState({ open: false })    
+        window.location.reload();
     };
 
     show = (size) => () => this.setState({ size, open: true })
@@ -133,8 +133,8 @@ class Sales extends Component {
                                     value: customer.id
                                 })
                             })}                
-                        />
-                  
+                        />                       
+                                        
                         <p>Product</p>
                         <Dropdown
                             placeholder='Select Product'
@@ -325,10 +325,8 @@ class EditModal extends Component {
 
     render() {
         const { open } = this.state
-
-        
-
         return (
+
             <Modal
                 key="saleEdit"
                 size="tiny"

@@ -38,9 +38,9 @@ class Products extends Component {
             name: this.state.name,
             price: this.state.price
         })
+            .then(response => this.setState({ products: [...this.state.products, response.data], name: '', price: '' }))
             .catch(err => console.log(err))
-        this.setState({ open: false })
-        window.location.reload()
+        this.setState({ open: false })        
     };
 
     setPageNum = (event, { activePage }) => {
@@ -166,8 +166,7 @@ class DeleteModal extends Component {
     close = () => this.setState({ open: false })
 
     handleDelete = value => e => {
-        axios.delete(`http://crud-task.azurewebsites.net/api/products/${value}`)
-        alert("Items will not be deleted if they are connected to Sales page...")
+        axios.delete(`http://crud-task.azurewebsites.net/api/products/${value}`)        
         this.setState({ open: false })
         window.location.reload()
     }
